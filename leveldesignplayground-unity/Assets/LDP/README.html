@@ -1,0 +1,385 @@
+<!-- NOTICE: Open this file in a browser to read it with formatting!  -->
+<!-- NOTICE: Open this file in a browser to read it with formatting!  -->
+<!-- NOTICE: Open this file in a browser to read it with formatting!  -->
+<!-- NOTICE: Open this file in a browser to read it with formatting!  -->
+<!-- NOTICE: Open this file in a browser to read it with formatting!  -->
+<!-- NOTICE: Open this file in a browser to read it with formatting!  -->
+
+<meta charset="utf-8" emacsmode="-*- markdown -*-">
+<link rel="stylesheet" href="readme-assets/apidoc.css">
+
+Version 1.0
+
+# Level Design Playground (LDP)
+LDP is a 2D platforming game template created in Unity to be used as a sandbox for game design students and hobbyists to
+experiment with level design concepts without needing to program and build their own game. The project includes all of
+its source code, so it can also be extended and serve as a reference example of a fully working game, but the primary
+goal is for users to be able to design levels with minimal technical knowledge.
+
+The breadth of gameplay elements available for this version of LDP (1.0) is fairly limited, but this may be expanded
+(more enemies, saw blade obstacles, etc) in future versions.
+
+## Prerequisites
+Building levels will not require any coding, but it will require basic knowledge of the Unity editor and use of some
+Unity tools like the tilemap editor. LDP will not teach you how to use Unity, but most concepts needed for the LDP can
+be learned from widely available tutorials online and from Unity’s own documentation.
+
+Unity 2020.3.19f1 is recommended. Newer versions are likely to work, but have not yet been tested and are not officially
+supported.
+
+
+## How Levels Work
+!!!
+LDP is architected this way in order to support multiple levels robustly, but multiple levels are not yet supported for
+this version (UI needs to be built). This will be supported in future versions.
+
+### Main Scene
+The `Main` scene always needs to be loaded in order to run the game. It contains the entry point for the entire game’s
+code, and without it, nothing will happen.
+
+### Level Scenes
+Level scenes contain all of the gameplay-related objects for a level, and are loaded additively on top of the main
+scene. To load both the main scene and a level scene in the editor, first open the main scene, then drag and drop a
+level scene onto the hierarchy.
+
+### Level Root
+Every level scene must contain an object with a `LevelRoot_mono` component, and all other gameplay elements should be
+parented to this object. This object/component is used to link objects in the scene to the game code.
+
+### “Levels” Asset
+You must also assign the level to the `Levels` asset in the main assets folder. This asset tells the game code which
+level to load when there is not already one loaded or when the player resets the game from a menu. Changing this asset
+will automatically update the build settings to include the appropriate scenes.
+
+
+## Creating A Level
+The simplest way to create a new level is to duplicate the scene called `Template Level` which is included in the main
+assets folder, then assign the new scene to the `Level` field in the `Levels` asset.
+
+The Template scene contains a tiny level with at least one of each gameplay element which you use as a parts kit.
+
+### Editing The Tilemaps
+This game’s assets and demo levels are set up using Unity’s tile map system. Three tile maps are present in the template
+and demo level:
+
+Terrain
+: This tilemap has normal collision and can be used to make most of the normal ground.
+
+One Way Platforms
+: This tilemap has been assigned a special physics layer which allows the player to pass through objects both ways (but
+still walk on it), and `Platform Effector` component that allows all objects to pass through in one direction.
+
+Hazards
+: This tilemap has a `Hazard_mono` component attached to it, which registers it in the game code as something that will
+kill the player if touched.
+
+!!! tip
+For information on how to work with TileMaps in Unity, refer to the documentation:<br>
+https://docs.unity3d.com/Manual/class-Tilemap.html<br>
+and/or this short tutorial:<br>
+https://www.youtube.com/watch?v=fmNtibNWPhc
+
+!!!
+Using tilemaps is recommended for LDP, but the game also supports all other 2D physics colliders.
+
+
+## Gameplay elements
+If you have a request for an additional gameplay element or mechanic, let us know on the forums:
+https://stefdevs.itch.io/ldp/community
+
+All gameplay object prefab is located at ` leveldesignplayground-unity\Assets\DevDev\content\prefabs\ `
+
+### Spawning
+The level spawn point is represented by the `level start` prefab. When the level is started the player will be spawned
+at this object’s position. For development purposes, if a player prefab is already in the scene and active, the player
+will spawn at that location instead. In order to use the level spawn, ensure that there is not a player prefab in the
+scene already.
+
+![]("readme-assets/player-spawn.gif" width="80%" border="3")
+
+### Player Movement
+The player can move left and right, jump, and fall-through certain platforms. Controllers and keyboards are supported
+using standard keymappings that most players are familiar with (see: Input subsection).
+
+![]("readme-assets/player-movement.gif" width="80%" border="3")
+
+### Checkpoints
+Checkpoints are represented by flagpoles. Checkpoints are activated by touching the checkpoint object. Only one
+checkpoint will be active at a time, and dying will respawn the player at the active checkpoint.
+
+![]("readme-assets/cross-checkpoint.gif" width="80%" border="3")
+
+### Moving platforms
+There is a prefab for moving platforms included. Moving platforms can move linearly or in a circle, and there are gizmos
+drawn in the editor for each movement mode to visualize the platform's path. If the mode `PINGPONG` is selected, you can
+use the two waypoint child objects to control where the platform moves between.
+
+![]("readme-assets/moving-platforms.gif" width="80%" border="3")
+
+`cycleTime` controls the time it takes for the platform to make a full loop, and `loopOffset` controls the platform's
+initial position. You can select the movement mode using the exposed `trackType` enum, and there are variables exposed
+for each movement type with prefixes denoting the mode that they are used for (ie: `circular_radius`).
+
+![]("readme-assets/moving-platforms-inspector.jpg" width="80%" border="3")
+
+### One-Way Platforms
+
+Any collider objects assigned to the layer `oneWayPlatforms` will allow the player to pass through the geometry from
+underneath, but still land on it from above. Players can also drop through one-way platforms by pressing `down`.
+
+![]("readme-assets/one-way-platform.gif" width="80%" border="3")
+
+
+### Collectables
+You can place collectables in the map for the player to collect. Collectables will be counted at the top-right of the
+screen and on the level completion screen. The number of collected collectables is also shown in the final win-screen.
+
+![]("readme-assets/grabbing-collectables.gif" width="80%" border="3")
+
+### Hazards
+Hazards kill the player instantly if collision is detected with the player. Hazards are registered by the game by
+looking for any object under the level root object and must have a reference to a collider which is used for collision
+detection.
+
+![]("readme-assets/fall-on-hazard.gif" width="80%" border="3")
+
+### Enemies
+There is currently one type of enemy included in the kit - the evil piggy. When calm, piggy will patrol back and forth
+on whatever platform it's standing on. If the player is visible (in front of piggy, not above or below, and within
+range), piggy will enter an aggro state, turn red, and charge at the player. The player can kill the piggy by jumping on
+its head, and piggy can kill the player by touching the player in any other way.
+
+![]("readme-assets/death-by-piggy.gif" width="80%" border="3")
+
+### Goal
+The primary objective of levels is to get to the goal. The goal is represented by a trophy. If collision is detected
+between the player and a goal object, the level will be completed. Multiple goals in one level is supported, but the
+player will only need to touch one of them to complete the level.
+
+![]("readme-assets/level-goal.jpg" width="80%" border="3")
+
+### Timer
+Elapsed time is tracked on the HUD and at level completion. Time will not reset when the player dies/respawns, but will
+reset if the game is reset. The level completion time is also shown in the final win-screen.
+
+![]("readme-assets/timer.gif" width="80%" border="3")
+
+### Kill Floor
+The kill floor is an empty gameobject referenced by the level environment root that defines the minimum y-position that
+the player can fall to before being killed. This makes it impossible for the player to fall infinitely.
+
+![]("readme-assets/kill-floor.gif" width="80%" border="3")
+
+## Gameplay Options and Tuning
+You can tune and adjust certain parameters like the player movement and enemy behaviour using the assets located in the
+main Assets folder.
+
+### Player Movement Params
+![]("readme-assets/movement-params.jpg" border="3")
+
+!!! tip
+"Pawn" refers to an entity with player-like bipedal movement capability. This currently includes the player and pig
+enemies.
+
+jumpHeight
+: Peak height of the pawn's jump
+
+bounceHeight
+: How high the pawn will bounce when landing on an enemy
+
+legReach_pawnWidth
+: How far the pawn can search when looking for a valid foothold to stand on or move toward
+
+legReach_extraWhenRunning
+: Additional leg reach in the direction of the pawn's movement
+
+jumpForgiveness_early
+: Time in seconds that the player can press jump before being grounded and still successfully jump.
+
+jumpForgiveness_late
+: Time in seconds that the player can press jump after being grounded and still successfully jump. (ie: jumping after
+passing over a ledge)
+
+footholdRaycastResolution
+: Number of rays cast, per meter, when searching for valid footholds to stand on
+
+maxSlope
+: Maximum steepness, in degrees, that the pawn can stand/run on
+
+maxRunSpeed
+: Maximum speed the pawn can accelerate to when maximum move input is given and pawn is on the ground
+
+maxRunAccel
+: Move acceleration when maximum move input is given and pawn is on the ground
+
+airControl_maxSpeed
+: Maximum speed the pawn can accelerate to when maximum move input is given, regardless of if the pawn is on the ground
+
+airControl_maxAccel
+: Move acceleration when maximum move input is given, regardless of if the pawn is on the ground
+
+drag_air
+: Drag coefficient which is always applied
+
+drag_braking_passive
+: Drag coefficient applied when pawn is on the ground and target speed is less than the current speed
+
+drag_braking_reversalHelp
+: Drag coefficient applied when pawn is on the ground and move input direction is opposed to the pawn's current velocity
+### Enemy Movement
+Same as Player Movement Params subsection
+
+### Enemy AI Params
+![]("readme-assets/enemy-ai-params.jpg" border="3")
+
+speedScale_calm
+: Magnitude of movement input when not attacking the player
+
+speedScale_aggro
+: Magnitude of movement input when attacking the player
+
+vision_maxDist_calm
+: Max distance the enemy can detect the player from when not aggroed
+
+vision_maxDist_aggro
+: Max distance the enemy can detect the player from when aggroed
+
+aggroLossDelay
+: Time in seconds that it takes for the enemy to go back to a calm state after losing sight of the player
+
+
+## Input
+This project uses Unity's newer input system. You can view and edit the input keybinds by editing the actions asset
+located at Assets\DevDev\content\Params
+
+![]("readme-assets/input-system-actions.jpg" border="3")
+
+
+
+## Frame Timing
+Frame timing options can be set in the `Game Params` asset found in the main Assets folder.
+
+![]("readme-assets/timing-options.jpg" border="3")
+
+The game simulation will always run at a fixed rate, controlled by the `Fixed Tick Rate` parameter. This is just like
+Unity's `Fixed Timestep`, but is a custom implementation of simulation timing.
+
+You can limit the framerate by setting `Frame Rate Max`. This can help if you want to lower power consumption, free cpu
+resources for other processes, or help resolve screen tearing issues.
+
+The fixed tick rate should ideally be much higher than the frame rate, and currently values lower than the frame rate
+max are not supported.
+
+`Frame Rate Min` guards against simulation instability in cases of poor performance. If the game fails to hit the
+minimum frame rate it will stutter instead of accumulating large time deltas or trying to simulate an increasing number
+of fixed timesteps.
+
+
+## Performance
+This game is fairly light weight so most computers that can run Unity should have no problem hitting a minimum frame
+rate of 30fps in the editor play mode. If you _are_ having performance issues, try the following:
+- Ensure that the `Profiler` tab is not open and recording.
+- Hide the `Scene` tab so that it's not drawing.
+- Reduce the `Fixed Timestep` value.
+- Lower the game display resolution.
+- Make a build. The game will always run much slower in the editor than in a build.
+
+
+## Building An Executable
+Building the game should be as simple as going to the build settings dialogue (`File > Build Settings`), configuring for
+your platform, and pressing build. The included scenes will be automatically populated by the `Levels` asset in the main
+Assets folder (see: How Levels Work section)
+
+
+## Code Architecture
+Extensibility is not the primary consideration for this project, but in case you feel the need to dive into the code,
+this section will give you an overview of how things are set up. LDP code in some areas may not be as "clean" as it
+possibly can be, but this will be improved as the project matures.
+
+!!! warning
+All included code may be subject to [drastic] change in future versions.
+
+!!! tip
+This game is not written in the typical object-oriented style that most Unity are. Despite the style being different
+from the norm, I think you'll find it more straight-forward to read and modify than a typical project. If you're curious
+about this "style" of programming, I recommend reading this: <https: //caseymuratori.com/blog_0015>
+
+    All source code can be found in the `Assets/LDP/code` directory.
+
+    ### Structs And Procedures
+    The two most important files are `Structs.cs` and `Procs.cs`. `Structs` contains all of the data structures, and
+    `Procs` contains all of the procedures (aka functions). Almost all procedures in the LDP are static functions and
+    only operate on data explicitly passed in via the function parameters. There may be additional files with data or
+    procedures (ie: `Procs_UI`), but this is only for organizational purposes, and the concept remains the same: _the
+    data is seperate from the procedures_.
+
+    Most of the data structures in LDP are simple C# structs or classes; they do not inherit from Unity's classes (ie:
+    monobehaviour) and thus don't interface directly with the Unity Editor or Runtime. In some situations where we want
+    to expose data to the editor or represent an entity in the scene as a gameobject, the LDP struct is wrapped in a
+    monobehaviour or scriptable object. These wrapper classes are denoted with suffixes like `_mono` or `_so`.
+
+    ![]("readme-assets/wrapped-struct-example.jpg" border="3")
+
+    !!! tip
+    In C#, classes are passed/assigned by reference, and structs are passed/assigned by value (the struct value will be
+    copied). Be mindful of this as LDP makes use of both depending on the situation.
+
+    ### Control Flow
+    The main entry point into the LDP gameplay code is in `Main_mono.cs`. In `Main_mono`, a new instance of `Game` is
+    created on awake, then `Procs.Main_Update()` in the Update event. This is the only code that runs in Monobehaviour
+    scripts, except for some editor functions and UI hooks. The `Game` class is the _root_ of all game state, which
+    means that _all_ LDP runtime data can be accessed through `Game`.
+
+    If you set a breakpoint at the `Procs.Main_Update()` call in `Main_mono`, you can step through the entire control
+    flow of the program step by step. This is the best way to learn how LDP works.
+
+    ### Use of `internal` Keyword
+    ![ ]("readme-assets/inspector-debug-mode-example.jpg" height="300" border="3") C#'s
+    [`internal`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/internal) keyword is an
+    access modifier like `public` or `private`. It's intended function is to manage accessibility between
+    [assemblies](https://docs.microsoft.com/en-us/dotnet/standard/assembly/), but for the purposes of LDP, we use
+    `internal` for any publicly accessible variable that we want to hide in editor inspectors. The `[HideInInspector]`
+    attribute is not used to achieve because `internal` allows you to view the data if the inspector is in debug mode,
+    and `internal` is much less cumbersome to write.
+
+
+    ### Use of `ref` Keyword
+    LDP code use [`ref`](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/ref) to indicate
+    that a function parameter will be modified in the function. This is necessary for struct parameters to be modified
+    instead of copied, but `ref` is also used for classes just to be extra clear about what the function is doing.
+
+
+    ## Credits
+    Thanks to Rob Wilson for all included music and sound effects. If you're looking for someone to create audio for
+    your project, you can contact him [here](catscovemedia@gmail.com).
+
+    World and character textures were created and made available for free by
+    [@_PixelFrog](http://twitter.com/_PixelFrog) and are available
+    [here](https://pixelfrog-store.itch.io/pixel-adventure-1) and
+    [here](https://pixelfrog-store.itch.io/pixel-adventure-2).
+
+    UI Textures were created and made available for free by [Kenney Vleugels](https://twitter.com/KenneyNL) and are
+    available [here](https://kenney.nl/assets/pixel-ui-pack).
+
+    ## License
+    Copyright 2021 DevDev Inc.
+
+    Redistribution of code, software, or software built using code included in the folder or any subfolders of `
+    leveldesignplayground-unity\Assets\LDP\code` is not permitted, except for educational use. All rights to audio
+    assets included in this package are owned by CATS COVE MEDIA and redistribution of these audio assets is not
+    permitted, except for educational use.
+
+
+    <style>
+        h1:before {
+            content: none;
+        }
+    </style>
+    <style class="fallback">
+        body {
+            visibility: hidden
+        }
+    </style>
+    <script>markdeepOptions = { tocStyle: 'long' };</script>
+    <!-- Markdeep: -->
+    <script src="readme-assets/markdeep.js?" charset="utf-8"></script>

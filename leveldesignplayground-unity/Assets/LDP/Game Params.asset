@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fe782e545ce98c4a9b8b7526cb22135, type: 3}
+  m_Name: Game Params
+  m_EditorClassIdentifier: 
+  data:
+    frameRateMin: 30
+    frameRateMax: 120
+    fixedTickRate: 240
+    audioMixer: {fileID: 24100000, guid: f05f50e90c8559542958966db8faa489, type: 2}
+    assetReferences_so: {fileID: 11400000, guid: 46d7c031a4cf488448b3855d2129fadb,
+      type: 2}
+    sceneSet: {fileID: 11400000, guid: d00552f50fc579b44bdce4b1507f063d, type: 2}

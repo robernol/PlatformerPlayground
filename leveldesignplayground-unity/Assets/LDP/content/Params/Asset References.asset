@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c7859e9f2fb8c04f9b7f9823c1d8769, type: 3}
+  m_Name: Asset References
+  m_EditorClassIdentifier: 
+  data:
+    mainScreenUI: {fileID: 3573062132116746638, guid: c73273b166d769c4787d4ce46acc5f6d,
+      type: 3}
+    playerFab: {fileID: 8644104492392091499, guid: 6fc88dc2372aabd4aacdeffd7ffef206,
+      type: 3}
+    enemyFab: {fileID: 6828956498729886959, guid: 0b0d3e822d13f9a4190925ad261c1f8f,
+      type: 3}
